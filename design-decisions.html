@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design Decisions — Rakshita Gupta Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      color: #111800;
+      background: #f0ece4;
+      padding: 40px 32px;
+      line-height: 1.5;
+    }
+
+    /* page header */
+    .page-title { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #7891F7; margin-bottom: 8px; }
+    .page-h { font-size: 36px; font-weight: 800; letter-spacing: -0.03em; color: #111800; margin-bottom: 6px; }
+    .page-sub { font-size: 14px; color: #4A5020; opacity: 0.7; margin-bottom: 40px; }
+
+    /* section */
+    .section { margin-bottom: 40px; }
+    .section-title {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+      color: #7891F7; margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 1px solid rgba(120,145,247,0.25);
+    }
+
+    /* card grid */
+    .cards { display: flex; gap: 14px; flex-wrap: wrap; }
+    .card {
+      background: white; border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      flex: 1; min-width: 200px;
+    }
+    .card-label { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #7891F7; margin-bottom: 6px; }
+    .card-title { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; color: #111800; margin-bottom: 6px; }
+    .card-body { font-size: 12px; color: #4A5020; line-height: 1.55; }
+    .card-rule { font-size: 11px; font-weight: 600; color: #888; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.06); font-style: italic; }
+
+    /* color swatches */
+    .swatch-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .swatch-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .swatch { width: 52px; height: 52px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.08); }
+    .swatch-hex { font-size: 10px; font-weight: 600; color: #636F73; letter-spacing: 0.02em; }
+    .swatch-name { font-size: 10px; color: #4A5020; opacity: 0.7; text-align: center; max-width: 60px; }
+
+    /* type specimens */
+    .type-specimen { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .type-specimen:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .type-meta { font-size: 10px; color: #8090C8; margin-bottom: 4px; font-weight: 600; letter-spacing: 0.06em; }
+
+    /* decision log */
+    .decision { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: flex-start; }
+    .decision:last-child { border-bottom: none; }
+    .d-num { font-size: 11px; font-weight: 800; color: #7891F7; width: 24px; flex-shrink: 0; padding-top: 2px; }
+    .d-content {}
+    .d-q { font-size: 13px; font-weight: 700; color: #111800; margin-bottom: 4px; }
+    .d-a { font-size: 12px; color: #4A5020; line-height: 1.55; }
+    .d-reason { font-family: 'Caveat', cursive; font-size: 13px; color: #6070C8; display: block; margin-top: 4px; }
+
+    /* tilt rule table */
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { text-align: left; padding: 8px 12px; background: rgba(120,145,247,0.1); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #3A4A80; }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(0,0,0,0.05); color: #4A5020; }
+    tr:last-child td { border-bottom: none; }
+    .tilt-val { font-family: 'Caveat', cursive; font-size: 15px; color: #7891F7; font-weight: 700; }
+
+    /* highlight demos */
+    .hl-demo { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: #111800; margin-bottom: 8px; }
+    .hl-marker {
+      background: linear-gradient(to right, transparent 0%, rgba(250,233,106,0.5) 7%, rgba(250,233,106,0.48) 93%, transparent 100%);
+      padding: 2px 8px; margin: 0 -4px; display: inline;
+    }
+    .hl-ul { border-bottom: 3px solid rgba(250,233,106,0.85); padding-bottom: 1px; display: inline; }
+    .hl-context { font-size: 11px; color: #636F73; margin-top: 4px; }
+
+    /* chip demo */
+    .chip-demo {
+      display: inline-block; background: #7891F7; color: #fff;
+      font-size: 8px; font-weight: 700; letter-spacing: 0.28em; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 5px; transform: rotate(-2deg);
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.08); margin-bottom: 8px;
+    }
+
+    /* washi tape demo */
+    .tape-demo { display: inline-block; width: 80px; height: 14px; border-radius: 2px; margin-right: 10px; vertical-align: middle; }
+
+    /* pol mini demo */
+    .pol-mini { display: inline-block; background: white; padding: 7px 7px 24px; box-shadow: 2px 3px 12px rgba(0,0,0,0.14); vertical-align: top; margin-right: 12px; }
+    .pol-mini .ph { width: 60px; height: 72px; border-radius: 2px; display: block; }
+    .pol-mini .cap { font-family: 'Caveat', cursive; font-size: 10px; color: #2A3010; text-align: center; padding-top: 4px; }
+    .pol-tl { transform: rotate(-8deg); }
+    .pol-tr { transform: rotate(5deg); }
+
+    /* icon demo */
+    .icons-row { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+    .icon-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .icon-item span { font-size: 10px; color: #636F73; }
+
+    footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.08); font-family: 'Caveat', cursive; font-size: 14px; color: #8090C8; text-align: center; }
+  </style>
+</head>
+<body>
+
+<div class="page-title">Design System Reference</div>
+<h1 class="page-h">Design Decisions</h1>
+<p class="page-sub">Rakshita Gupta Portfolio — every decision made, why it was made, and the rule that governs it.</p>
+
+<!-- ══ COLORS ══ -->
+<div class="section">
+  <div class="section-title">01 — Color palette</div>
+  <div class="cards" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-label">Decision — Updated Jun 2026</div>
+      <div class="card-title">Butter Yellow + Richer Periwinkle on Near-White Cream</div>
+      <p class="card-body">Original palette: #E2ED84 (chartreuse) + #ABBAF9 (pale periwinkle). Updated: #FAE96A (butter yellow) — warmer, less acidic, feels more personal. #7891F7 (richer periwinkle) — 10% deeper, text is now legible against cream without losing the blue-violet hue. Cream shifted to #FEFEF9 — barely perceptible but removes the slight yellow cast that clashed with the new yellow accent.</p>
+      <p class="card-rule">Rule: Colors touch less than 10% of the page surface. Periwinkle = chips + tape. Yellow = highlights, stickers, now-dot only.</p>
+    </div>
+  </div>
+  <div class="swatch-row">
+    <div class="swatch-item">
+      <div class="swatch" style="background:#FEFEF9;border:1px solid #ccc;"></div>
+      <div class="swatch-hex">#FEFEF9</div>
+      <div class="swatch-name">Near-White Cream (base)</div>
+    </div>
+    <div class="swatch-item">
+      <div class="swatch" style="background:#FAE96A;"></div>
+      <div class="swatch-hex">#FAE96A</div>
+      <div class="swatch-name">Butter Yellow (highlights, stickers)</div>
+    </div>
+    <div class="swatch-item">
+      <div class="swatch" style="background:#7891F7;"></div>
+      <div class="swatch-hex">#7891F7</div>
+      <div class="swatch-name">Rich Periwinkle (chips, tape, dots)</div>
+    </div>
+    <div class="swatch-item">
+      <div class="swatch" style="background:#111800;"></div>
+      <div class="swatch-hex">#111800</div>
+      <div class="swatch-name">Dark Ink (headings + body)</div>
+    </div>
+    <div class="swatch-item">
+      <div class="swatch" style="background:#443C00;"></div>
+      <div class="swatch-hex">#443C00</div>
+      <div class="swatch-name">Ink Soft (body text)</div>
+    </div>
+    <div class="swatch-item">
+      <div class="swatch" style="background:#6070C8;"></div>
+      <div class="swatch-hex">#6070C8</div>
+      <div class="swatch-name">Annotation Blue (Caveat notes)</div>
+    </div>
+    <div class="swatch-item">
+      <div class="swatch" style="background:#8090C8;"></div>
+      <div class="swatch-hex">#8090C8</div>
+      <div class="swatch-name">Aside Muted (stat asides)</div>
+    </div>
+    <div class="swatch-item">
+      <div class="swatch" style="background:#6B5800;"></div>
+      <div class="swatch-hex">#6B5800</div>
+      <div class="swatch-name">Yellow Label (env-label-y, tl-year-now)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TYPOGRAPHY ══ -->
+<div class="section">
+  <div class="section-title">02 — Typography</div>
+  <div class="cards" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-label">Decision</div>
+      <div class="card-title">Bricolage Grotesque + Caveat</div>
+      <p class="card-body">Tested: Fraunces (too delicate against bold colors), Cormorant Garamond (too close to galpal), Instrument Serif (too editorial/polished), Darker Grotesque (strong alternative). Chosen: Bricolage Grotesque 800 — chunky, warm, has personality bumps that stop it feeling corporate. Caveat for all annotations, captions, stat asides.</p>
+      <p class="card-rule">Rule: Headings always dark #111800. Periwinkle never on heading text. Bricolage 800 for display, 400 for body, 500 for inline story text.</p>
+    </div>
+  </div>
+  <div style="background:white;border-radius:12px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+    <div class="type-specimen">
+      <div class="type-meta">Bricolage Grotesque 800 · 52px · Hero heading</div>
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:52px;font-weight:800;letter-spacing:-0.03em;line-height:1.0;color:#111800;">I build things people love.</div>
+    </div>
+    <div class="type-specimen">
+      <div class="type-meta">Bricolage Grotesque 800 · 32px · Section heading</div>
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:32px;font-weight:800;letter-spacing:-0.02em;color:#111800;">I came from a third world: people.</div>
+    </div>
+    <div class="type-specimen">
+      <div class="type-meta">Bricolage Grotesque 500 · 26px · Inline story text (lighter weight)</div>
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:26px;font-weight:500;letter-spacing:-0.01em;line-height:1.55;color:#111800;">I started designing for Fortune 500 companies.</div>
+    </div>
+    <div class="type-specimen">
+      <div class="type-meta">Bricolage Grotesque 400 · 14–15px · Body text</div>
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:400;line-height:1.78;color:#4A5020;opacity:0.8;max-width:520px;">Six years building things — as a designer, then an agency co-founder, then an edtech entrepreneur. Somewhere in the middle, I realised what actually excited me wasn't shipping features.</div>
+    </div>
+    <div class="type-specimen">
+      <div class="type-meta">Caveat 600 · 15–16px · Annotations, captions, stat asides</div>
+      <div style="font-family:'Caveat',cursive;font-size:16px;font-weight:600;color:#6070C8;">hey, that's me! ↙ &nbsp;&nbsp; the best work: a WhatsApp message, not a feature</div>
+    </div>
+    <div class="type-specimen">
+      <div class="type-meta">Bricolage Grotesque 700 · 8px · Eyebrow chip label</div>
+      <div class="chip-demo">Behavioral PM · Founder · Community Builder</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TEXT HIGHLIGHTS ══ -->
+<div class="section">
+  <div class="section-title">03 — Text highlight styles</div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Chosen — Marker wash</div>
+      <div class="hl-demo"><span class="hl-marker">people love.</span></div>
+      <p class="hl-context">Gradient fades in/out at left and right edges — like a real marker stroke. Used when NO eyebrow chip is present in the section. Butter yellow at 45% opacity.</p>
+      <p class="card-rule">CSS: linear-gradient(to right, transparent 0%, rgba(250,233,106,0.5) 7%, … transparent 100%)</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Chosen — Underline</div>
+      <div class="hl-demo"><span class="hl-ul">people.</span></div>
+      <p class="hl-context">Used when an eyebrow chip IS present in the same section — avoids double emphasis. 3px border-bottom, butter yellow at 85% opacity.</p>
+      <p class="card-rule">Rule: Never use marker wash AND underline in the same section. Never use either with a chip unless it's underline.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BACKGROUND TEXTURE ══ -->
+<div class="section">
+  <div class="section-title">04 — Background texture</div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Decision</div>
+      <div class="card-title">Dot grid, 4.4% opacity</div>
+      <p class="card-body">Tested: graph paper (too structured), ruled lines + margin (too diary), crosshatch (too faint). Chosen: dot grid — most breathing room, most like a Leuchtturm notebook. Opacity pulled back so dots are ambient, not noisy.</p>
+      <p class="card-rule">CSS: radial-gradient(circle, rgba(0,0,0,0.044) 1.2px, transparent 1.2px) · background-size: 22px 22px</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Constraint</div>
+      <div class="card-title">Cream all the way through</div>
+      <p class="card-body">No dark sections anywhere. Every section background is the same near-white cream #FEFEF9. Section breaks use a single 1px line at rgba(0,0,0,0.07) — a whisper, not a border.</p>
+      <p class="card-rule">Rule: If a section feels heavy, remove color and add space. Never add a dark background.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EYEBROW CHIP ══ -->
+<div class="section">
+  <div class="section-title">05 — Eyebrow chip</div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Component</div>
+      <div class="card-title">Rotated periwinkle label tag</div>
+      <div class="chip-demo">Behavioral PM · Founder</div>
+      <p class="card-body">Background #7891F7, white text, 8px Bricolage 700, all-caps, letter-spacing 0.28em, border-radius 5px, rotate(-2deg), box-shadow 2px 2px 0 rgba(0,0,0,0.08).</p>
+      <p class="card-rule">Rule: ONE per section maximum. When chip is present → use underline for text emphasis. No wash highlight allowed in same section.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TILT SYSTEM ══ -->
+<div class="section">
+  <div class="section-title">06 — Tilt system</div>
+  <div style="background:white;border-radius:12px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+    <p style="font-size:13px;color:#4A5020;margin-bottom:16px;">The tilt is the personality. Everything non-body has a slight rotation. Headings and body copy stay perfectly straight — that contrast is what makes the tilts feel intentional.</p>
+    <table>
+      <tr><th>Element</th><th>Rotation</th><th>Notes</th></tr>
+      <tr><td>Eyebrow chip</td><td class="tilt-val">−2°</td><td>Always consistent</td></tr>
+      <tr><td>Polaroid photos</td><td class="tilt-val">±3° to ±9°</td><td>Each different, no two the same angle</td></tr>
+      <tr><td>Washi tape strips</td><td class="tilt-val">±4° to ±12°</td><td>More expressive than the photos</td></tr>
+      <tr><td>Stat cards</td><td class="tilt-val">±0.5° to ±1.5°</td><td>Very subtle, just breaks the grid</td></tr>
+      <tr><td>Section/timeline tags</td><td class="tilt-val">−1°</td><td>Gentle drift</td></tr>
+      <tr><td>Caveat annotations</td><td class="tilt-val">±5° to ±12°</td><td>Most expressive element on page</td></tr>
+      <tr><td>Work env. cards</td><td class="tilt-val">±0.4°</td><td>Alternate: card 2 +0.4°, card 3 −0.4°</td></tr>
+      <tr><td>Headings + body copy</td><td class="tilt-val">0°</td><td>Always perfectly straight. Non-negotiable.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══ POLAROIDS ══ -->
+<div class="section">
+  <div class="section-title">07 — Polaroid component</div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Component</div>
+      <div class="card-title">Tilted Polaroids with washi tape</div>
+      <div style="margin:12px 0;display:flex;gap:16px;align-items:flex-start;">
+        <div class="pol-mini pol-tl">
+          <div class="ph" style="background:#FAE96A;"></div>
+          <div class="cap">at IIT Bombay</div>
+        </div>
+        <div class="pol-mini pol-tr">
+          <div class="ph" style="background:#D8E0F6;"></div>
+          <div class="cap">GalPal launch</div>
+        </div>
+      </div>
+      <p class="card-body">White frame, wider base (Polaroid effect), photo well in palette colors (never white/grey). Caveat caption in the base — personal and specific. Washi tape strips at corners.</p>
+      <p class="card-rule">Photo well colors: #FAE96A (butter yellow) · #D8E0F6 (periwinkle soft) · contact polaroids use real photos with object-fit: cover</p>
+    </div>
+    <div class="card">
+      <div class="card-label">Washi Tape</div>
+      <div class="card-title">Semi-transparent strips, smooth edges</div>
+      <div style="margin:12px 0;">
+        <div class="tape-demo" style="background:rgba(120,145,247,0.52);transform:rotate(-4deg);display:inline-block;"></div>
+        <div class="tape-demo" style="background:rgba(250,233,106,0.55);transform:rotate(3deg);display:inline-block;"></div>
+      </div>
+      <p class="card-body">Smooth edges chosen over torn/rough edges — cleaner execution. Alternate periwinkle (rgba 120,145,247, 0.52) and butter yellow (rgba 250,233,106, 0.55). ~40×13px, border-radius 2px.</p>
+      <p class="card-rule">Rule: Place at corners of Polaroids and at tops of stat cards to simulate being physically held down.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ICONS ══ -->
+<div class="section">
+  <div class="section-title">08 — Icon style</div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Chosen — Option B</div>
+      <div class="card-title">Hand-drawn wobbly outline</div>
+      <div class="icons-row" style="margin:12px 0;">
+        <div class="icon-item">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path d="M16 4 C13 4 10 7 10 10 C10 13 13 16 16 16 C19 16 22 13 22 10 C22 7 19 4 16 4Z" stroke="#111800" stroke-width="1.5" fill="none"/>
+            <path d="M5 28 C5.5 22 9 18 16 18 C23 18 26.5 22 27 28" stroke="#111800" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span>person</span>
+        </div>
+        <div class="icon-item">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path d="M5 19 L5.2 28.1 L10.8 28 L11 17.9 L5 19Z" stroke="#111800" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+            <path d="M14 12.1 L13.8 28 L19.2 27.9 L19 12 L14 12.1Z" stroke="#111800" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+            <path d="M22 5.2 L21.9 28 L27.1 28.1 L27 5 L22 5.2Z" stroke="rgba(250,233,106,1)" stroke-width="2" fill="rgba(250,233,106,0.15)" stroke-linejoin="round"/>
+          </svg>
+          <span>chart</span>
+        </div>
+        <div class="icon-item">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path d="M10 8 C7.5 8 5.5 9.8 5.5 12 C5.5 14.2 7.5 16 10 16 C12.5 16 14.5 14.2 14.5 12 C14.5 9.8 12.5 8 10 8Z" stroke="#111800" stroke-width="1.5" fill="none"/>
+            <path d="M22 8 C19.5 8 17.5 9.8 17.5 12 C17.5 14.2 19.5 16 22 16 C24.5 16 26.5 14.2 26.5 12 C26.5 9.8 24.5 8 22 8Z" stroke="#111800" stroke-width="1.5" fill="none"/>
+            <path d="M16 17 C13 17 10.5 19 10.5 21.5 C10.5 24 13 26 16 26 C19 26 21.5 24 21.5 21.5 C21.5 19 19 17 16 17Z" stroke="#7891F7" stroke-width="2" fill="rgba(120,145,247,0.12)"/>
+          </svg>
+          <span>community</span>
+        </div>
+      </div>
+      <p class="card-body">Slightly irregular paths that feel freehand. Stroke weight 1.5px. Key/accent icon gets chartreuse fill or periwinkle stroke. Supporting icons are plain dark outline.</p>
+      <p class="card-rule">Rejected: ultra-thin 1.2px (too airy for Bricolage 800 weight). Rejected: bold 2.2px (too heavy). Chosen: 1.5px wobbly for middle ground.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LAYOUT DECISIONS ══ -->
+<div class="section">
+  <div class="section-title">09 — Layout decisions per section</div>
+  <div style="background:white;border-radius:12px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+    <div class="decision">
+      <div class="d-num">01</div>
+      <div class="d-content">
+        <div class="d-q">Hero — Two column with Polaroid cluster right</div>
+        <div class="d-a">Chosen from Layout 2 (centered) reference. Two Polaroids only (not three — avoids overwhelming). No stat note in hero — 32% is reserved for the Philosophy section. CTAs are outline buttons.</div>
+        <span class="d-reason">rejected: folder/pocket (Layout 5) — too daring for first impression</span>
+      </div>
+    </div>
+    <div class="decision">
+      <div class="d-num">03</div>
+      <div class="d-content">
+        <div class="d-q">Philosophy — Two column with pull quote and stat cards</div>
+        <div class="d-a">The WhatsApp message story lives in a periwinkle pull-quote block. Stats float right in slightly tilted cards. This is where 32% lives — not in the hero.</div>
+      </div>
+    </div>
+    <div class="decision">
+      <div class="d-num">04</div>
+      <div class="d-content">
+        <div class="d-q">Story — Lighter inline text (Bricolage 500, not 800)</div>
+        <div class="d-a">Original Layout 4 used Bricolage 800 at 42px for the inline text — too heavy, too much emphasis. Reduced to 500 weight, 26px. Sticker chips for key phrases remain at 800.</div>
+        <span class="d-reason">fix: "bold font taking up too much space and emphasis overall"</span>
+      </div>
+    </div>
+    <div class="decision">
+      <div class="d-num">05</div>
+      <div class="d-content">
+        <div class="d-q">Skills — Q&amp;A format with "Yes." in periwinkle</div>
+        <div class="d-a">The "Can she...? Yes." structure anticipates every hiring manager objection and answers it directly. "Yes." in periwinkle at 22px is the visual anchor per row.</div>
+      </div>
+    </div>
+    <div class="decision">
+      <div class="d-num">06</div>
+      <div class="d-content">
+        <div class="d-q">Case Studies — Cards (Layout 3 reference)</div>
+        <div class="d-a">Header with palette color background, badge, project name. Honest take in italic. Tags as pill chips. Same structure across all three projects.</div>
+      </div>
+    </div>
+    <div class="decision">
+      <div class="d-num">08</div>
+      <div class="d-content">
+        <div class="d-q">Personal — Polaroid string with washi tape hangers</div>
+        <div class="d-a">Photos hung from a thin horizontal line using washi tape strips (not clips/forks). Blue and green tape alternate. Each photo at a different rotation angle.</div>
+        <span class="d-reason">fix: "current fork type shape looks weird" → replaced with washi tape strips</span>
+      </div>
+    </div>
+    <div class="decision">
+      <div class="d-num">SP</div>
+      <div class="d-content">
+        <div class="d-q">Social Proof — Chat bubble format</div>
+        <div class="d-a">iMessage/WhatsApp-style bubbles alternating left (periwinkle tint) and right (butter yellow tint). Feels like a real conversation rather than formal testimonials.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ANIMATIONS & INTERACTIONS ══ -->
+<div class="section">
+  <div class="section-title">11 — Animations &amp; interactions</div>
+  <div style="background:white;border-radius:12px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+    <div class="decision">
+      <div class="d-num">A</div>
+      <div class="d-content">
+        <div class="d-q">Beyond Work — Continuous marquee carousel (rAF loop)</div>
+        <div class="d-a">All 13 photo units are duplicated in HTML (aria-hidden on clones) to create a seamless loop. A requestAnimationFrame loop translates the row left at 1.2px/frame, resetting to 0 when the first half scrolls out. Hover pauses the loop. CSS animation was not used — overflow:hidden on the parent created a will-change compositing conflict that silently killed the animation.</div>
+        <span class="d-reason">CSS animation failed silently; rAF is the reliable path here</span>
+      </div>
+    </div>
+    <div class="decision">
+      <div class="d-num">B</div>
+      <div class="d-content">
+        <div class="d-q">Philosophy stat cards — Per-card hover tilt via initGroupTilt</div>
+        <div class="d-a">The existing initGroupTilt function was extended to accept a hoverDeltas array. On mouseenter each card applies its delta on top of its base rotation; on mouseleave the delta resets to 0. Card 1: −3°, Card 2: +3°, Card 3: −3°. The group tilt on mousemove continues to work simultaneously. Transition: 0.15s ease-out already on .stat-card.</div>
+        <span class="d-reason">direction per card = intentional personality, not random jitter</span>
+      </div>
+    </div>
+    <div class="decision">
+      <div class="d-num">C</div>
+      <div class="d-content">
+        <div class="d-q">Contact polaroids — Real photos + confetti on hover</div>
+        <div class="d-a">Polaroid photo wells replaced with real &lt;img&gt; tags using object-fit:cover. overflow:hidden removed from #connect so hover scaling isn't clipped. Base size: cp1 77×91px, cp2 71×83px (original +5px). Hover: img width/height grows by 10px via CSS transition (not transform scale — pixel-based gives precise control). Confetti burst via canvas-confetti CDN fires on mouseenter at the image's viewport position. Palette: periwinkle + butter yellow + annotation blue.</div>
+        <span class="d-reason">overflow:hidden on container was silently clipping CSS scale transforms; canvas-confetti uses position:fixed canvas so it was immune</span>
+      </div>
+    </div>
+    <div class="decision">
+      <div class="d-num">D</div>
+      <div class="d-content">
+        <div class="d-q">Contact polaroid sizing constraint</div>
+        <div class="d-a">Max hover size (87×101px for cp1, 81×93px for cp2) is far below the hero polaroid size (224×264px and 204×240px). This is the absolute ceiling — contact polaroids should never compete with or exceed hero polaroid scale.</div>
+        <span class="d-reason">hierarchy: hero polaroids are the landmark; contact polaroids are a delight detail</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ COLOR RULES UPDATED ══ -->
+<div class="section">
+  <div class="section-title">10 — Non-negotiable rules (updated)</div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Color</div>
+      <ol style="font-size:12px;color:#4A5020;line-height:1.8;padding-left:16px;">
+        <li>No dark background sections — cream (#FEFEF9) throughout</li>
+        <li>Butter yellow only on one phrase per section, at 45% opacity</li>
+        <li>Periwinkle (#7891F7) never on heading text — only chips, tape, dots</li>
+        <li>One eyebrow chip per section maximum</li>
+        <li>Chip present → underline only, no wash highlight</li>
+        <li>Yellow label text (#6B5800) for env-label-y, env-skill-y, tl-year-now</li>
+      </ol>
+    </div>
+    <div class="card">
+      <div class="card-label">Typography</div>
+      <ol style="font-size:12px;color:#4A5020;line-height:1.8;padding-left:16px;">
+        <li>Headings always dark #111800 (never periwinkle)</li>
+        <li>Body always Bricolage 400, never heavier</li>
+        <li>Caveat for all handwritten/personal elements only</li>
+        <li>Story inline text = Bricolage 500 at 26px (not 800)</li>
+      </ol>
+    </div>
+    <div class="card">
+      <div class="card-label">Layout + Interaction</div>
+      <ol style="font-size:12px;color:#4A5020;line-height:1.8;padding-left:16px;">
+        <li>Headings and body copy always perfectly straight (0°)</li>
+        <li>Everything else has a slight tilt</li>
+        <li>If a section feels heavy: remove color, add space</li>
+        <li>No overflow:hidden on sections with transform hover effects</li>
+        <li>CSS animations that fail silently → switch to rAF</li>
+        <li>Contact polaroids never exceed hero polaroid size (224×264px)</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<footer>Design Decisions · Rakshita Gupta Portfolio · June 2026 · Built in Claude Code</footer>
+
+</body>
+</html>

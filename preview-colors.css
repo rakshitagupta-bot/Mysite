@@ -1,0 +1,91 @@
+/* PREVIEW ONLY — color update preview, will be removed after approval */
+:root {
+  --chartreuse: #FAE96A;
+  --periwinkle: #7891F7;
+  --cream: #FEFEF9;
+}
+
+body {
+  background-color: #FEFEF9;
+}
+
+/* Yellow rgba overrides */
+.hl-marker {
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(250,233,106,0.60) 7%,
+    rgba(250,233,106,0.58) 93%,
+    transparent 100%
+  );
+}
+.hl-ul { border-bottom: 3px solid rgba(250,233,106,0.95); }
+
+.stat-card.yellow {
+  background: rgba(250,233,106,0.25);
+  border-color: rgba(250,233,106,0.4);
+}
+.stat-num .sw { background: rgba(250,233,106,0.5); }
+
+.tl-card-now {
+  border-color: rgba(250,233,106,0.55);
+  background: rgba(250,233,106,0.14);
+}
+.tl-tag-y { background: rgba(250,233,106,0.5); color: #282200; }
+.tl-stat-y { background: rgba(250,233,106,0.3); color: #282200; border: 1px solid rgba(250,233,106,0.5); }
+.tl-stat-hero { background: rgba(250,233,106,0.3); color: #282200; border: 1px solid rgba(250,233,106,0.5); }
+.tl-dot-now { background: #E8C800; box-shadow: 0 0 0 3px rgba(232,200,0,0.3); }
+
+.cs-h-yellow { background: rgba(250,233,106,0.30); }
+.cs-badge-y { background: rgba(250,233,106,0.7); color: #282200; }
+.cs-link { border-bottom: 2px solid rgba(250,233,106,0.95); }
+
+.env-card-yellow {
+  background: rgba(250,233,106,0.20);
+  border-color: rgba(250,233,106,0.38);
+}
+.env-next { background: rgba(250,233,106,0.20); border: 1px solid rgba(250,233,106,0.40); }
+.env-next-tag { background: rgba(250,233,106,0.65); color: #282200; }
+.env-label-y { color: #6B5800; }
+.env-skill-y { color: #6B5800; }
+
+.st-green { background: rgba(250,233,106,0.75); }
+.story-sticker-y {
+  background: rgba(250,233,106,0.65);
+  border: 2px solid rgba(250,233,106,0.8);
+}
+.qa-tag { background: rgba(250,233,106,0.55); }
+
+.bubble-out {
+  background: rgba(250,233,106,0.32);
+  border: 1px solid rgba(250,233,106,0.50);
+}
+.ai-card-tag { background: rgba(250,233,106,0.55); }
+
+.hero-right .tape:nth-child(2) { background: rgba(250,233,106,0.60) !important; }
+.cp1 .ph { background: #FAF5D0 !important; }
+
+/* Yellow now-dot */
+.tl-year-now { color: #6B5800; }
+
+/* Periwinkle rgba overrides — base RGB(120,145,247) */
+.pullquote { background: rgba(120,145,247,0.18); }
+.ch-card { background: rgba(120,145,247,0.16); border: 1px solid rgba(120,145,247,0.28); }
+.tl-line { background: rgba(120,145,247,0.35); }
+.tl-card { border: 1px solid rgba(120,145,247,0.28); }
+.tl-dot { background: var(--periwinkle); box-shadow: 0 0 0 2px rgba(120,145,247,0.45); }
+.tl-tag-p { background: rgba(120,145,247,0.2); color: #2A3880; }
+.tl-stat-p { background: rgba(120,145,247,0.22); color: #2A3880; border: 1px solid rgba(120,145,247,0.35); }
+.cs-h-blue { background: rgba(120,145,247,0.28); }
+.cs-h-soft { background: rgba(120,145,247,0.20); }
+.cs-tag { border: 1px solid rgba(120,145,247,0.4); color: #2A3880; }
+.ai-card-pill { border: 1px solid rgba(120,145,247,0.40); color: #2A3880; }
+.ai-card { border: 1px solid rgba(120,145,247,0.28); }
+.journey-card { border: 1px solid rgba(120,145,247,0.28); }
+.logo-dot { background: rgba(120,145,247,0.6); }
+.env-card-blue { background: rgba(120,145,247,0.20); border-color: rgba(120,145,247,0.30); }
+.env-card-soft { background: rgba(120,145,247,0.16); border-color: rgba(120,145,247,0.24); }
+.bubble-in { background: rgba(120,145,247,0.22); border: 1px solid rgba(120,145,247,0.32); }
+.stat-card.blue { background: rgba(120,145,247,0.1); border-color: rgba(120,145,247,0.38); }
+.contact-ann-2 { color: rgba(120,145,247,0.7); }
+.cp2 .ph { background: #C8D0EC !important; }
